@@ -1,6 +1,8 @@
 #pragma once
 #include <d3d9.h>
 
+#include "configuration.hpp"
+
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_dx9.h"
 #include "imgui/imgui_impl_win32.h"
@@ -42,12 +44,14 @@ namespace gui {
 		MISC,
 		VISUALS
 	};
-	inline MenuTabs currentTab = ESP;
 
 	#define MakeMenuTab(tab, label, size) \
 	{ \
+		if(tab == g.gui.currentTab) {\
+			ImGui::SetItemDefaultFocus(); \
+		} \
 		if(ImGui::Button(label, size)) { \
-			currentTab = tab; \
+			g.gui.currentTab = tab; \
 		} \
 	}
 }

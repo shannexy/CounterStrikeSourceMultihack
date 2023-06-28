@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../common.hpp"
-
+#include "gui.hpp"
 #include "file_manager/file.hpp"
 #include "file_manager/folder.hpp"
 
@@ -28,9 +28,10 @@ private:
 	nlohmann::json m_options;
 public:
 	struct bhop {
-		bool enabled = false;
+		BhopType BhopType = BhopType::DISABLED;
+		bool AutoStrafe = false;
 
-		NLOHMANN_DEFINE_TYPE_INTRUSIVE(bhop, enabled)
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE(bhop, BhopType, AutoStrafe)
 	} bhop{};
 
 	struct chams {
@@ -58,9 +59,10 @@ public:
 
 	struct misc {
 		bool norecoil = false;
+		bool thirdperson = false;
 		float additional_fov = 0.0f;
 
-		NLOHMANN_DEFINE_TYPE_INTRUSIVE(misc, norecoil, additional_fov)
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE(misc, norecoil, thirdperson, additional_fov)
 	} misc{};
 
 	struct esp {
@@ -92,7 +94,13 @@ public:
 		NLOHMANN_DEFINE_TYPE_INTRUSIVE(visuals, bullet_impact, others_bullet_impact, bullet_impact_color, bullet_impact_duration, show_spectators, spectators_location, no_flash, no_smokes)
 	} visuals{};
 
-	NLOHMANN_DEFINE_TYPE_INTRUSIVE(configuration, bhop, chams, aimbot, esp, misc, visuals)
+	struct gui {
+		int currentTab;
+
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE(gui, currentTab)
+	} gui {};
+
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(configuration, gui, bhop, chams, aimbot, esp, misc, visuals)
 };
 
 inline auto g = configuration();

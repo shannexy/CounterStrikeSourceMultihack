@@ -1,15 +1,19 @@
+#ifndef CENTITY_H
+#define CENTITY_H
+#ifdef _WIN32
 #pragma once
+#endif
 
 #include "../core/interfaces.hpp"
 #include "../core/netvar.hpp"
+#include "../utils/hash.hpp"
 #include "../utils/memory.hpp"
+#include "../core/console.hpp"
 #include "icliententity.hpp"
 #include "chandle.hpp"
 #include "cutlvector.hpp"
 
 #include <string>
-
-class C_BaseCombatWeapon;
 
 enum e_ClassDefinitions
 {
@@ -249,6 +253,7 @@ public:
 		FL_TRANSRAGDOLL = (1 << 30),
 		FL_UNBLOCKABLE_BY_PLAYER = (1 << 31)
 	};
+
 public:
 	NETVAR(GetFlags, "CBasePlayer->m_fFlags", int);
 	NETVAR(Money, "CCSPlayer->m_iAccount", int);
@@ -262,7 +267,7 @@ public:
 	NETVAR(GetOwnerEntity, "CBaseEntity->m_hOwnerEntity", CHandle<C_BaseEntity>);
 	NETVAR(GetObserverMode, "CBasePlayer->m_iObserverMode", int);
 	NETVAR(GetObserverTarget, "CBasePlayer->m_hObserverTarget", CHandle<C_BaseEntity>);
-
+	NETVAR(LastPlaceName, "CBasePlayer->m_szLastPlaceName", const char*);
 private:
 	NETVAR(ActiveWeapon, "CBaseCombatCharacter->m_hActiveWeapon", CHandle<C_BaseCombatWeapon>);
 	NETVAR(ModelIndex, "CBaseEntity->m_nModelIndex", int);
@@ -328,9 +333,50 @@ public:
 		return memory::Call<bool>(this, 74);
 	}
 
-	constexpr bool IsAlive() noexcept
+	unsigned char GetLifeState() noexcept {
+		return RETURN_OFFSET(lifestate, "CBasePlayer", "m_lifeState", unsigned char);
+	}
+
+	bool IsAlive() noexcept
 	{
-		return memory::Call<bool>(this, 130);
+		unsigned char lifeState = GetLifeState();
+
+		return lifeState == 0;
+	}
+
+	std::vector<C_BaseEntity*> GetSpectators() noexcept {
+		std::vector<C_BaseEntity*> spectators = {};
+
+		/*for (int i = 1; i < interfaces::globals->maxClients; i++)
+		{
+			auto entity = C_BaseEntity::GetEntityByIndex(i);
+
+			if (!entity)
+				continue;
+
+			auto spectating = entity->GetObserverTarget().Get();
+			if (spectating != entity)
+			{
+				console::print(std::format("Is Alive: {}, Name: {}, this: {}", spectating->IsAlive(), spectating->GetPlayerName(), this->GetPlayerName()));
+			}
+		}*/
+
+		return spectators;
+	}
+
+	bool GetPlayerInfo(player_info_t* player_info) noexcept {
+		return interfaces::engine->GetPlayerInfo(this->entindex(), player_info);
+	}
+
+	std::string GetPlayerName() noexcept {
+		std::string PlayerName = {};
+
+		player_info_t info;
+		if (GetPlayerInfo(&info)) {
+			PlayerName = std::string(info.name);
+		}
+
+		return PlayerName;
 	}
 
 	bool IsWeapon() noexcept
@@ -457,3 +503,4 @@ public:
 		return reinterpret_cast<C_BaseCombatWeapon*>(C_BaseEntity::GetEntityFromHandle(ActiveWeapon()));
 	}
 };
+#endif

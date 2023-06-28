@@ -5,10 +5,19 @@
 #endif
 #include "cusercmd.hpp"
 #include "chandle.hpp"
+#include "../utils/memory.hpp"
 
 class C_BaseCombatWeapon;
 
-struct CameraThirdData_t;
+struct CameraThirdData_t
+{
+	float	m_flPitch;
+	float	m_flYaw;
+	float	m_flDist;
+	float	m_flLag;
+	CVector	m_vecHullMin;
+	CVector	m_vecHullMax;
+};
 
 class bf_write;
 class bf_read;
@@ -177,5 +186,13 @@ public:
 
 	// Set until polled by CreateMove and cleared
 	CHandle<C_BaseCombatWeapon>* m_hSelectedWeapon;
+
+	constexpr void ToThirdPerson() noexcept {
+		memory::Call<void>(this, 32);
+	}
+
+	constexpr void ToFirstPerson() noexcept {
+		memory::Call<void>(this, 33);
+	}
 };
 #endif

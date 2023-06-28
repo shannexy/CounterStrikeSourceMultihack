@@ -16,4 +16,4 @@ public:
 	virtual int					GetMaxEntities() = 0;
 };
 
-extern IClientEntityList* g_entityList;
+inline IClientEntityList* g_entityList;

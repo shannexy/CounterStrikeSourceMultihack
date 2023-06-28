@@ -1,5 +1,8 @@
 #include "gui.hpp"
 #include "interfaces.hpp"
+#include "../gui/components.hpp"
+#include "globals.hpp"
+#include "../valve/centity.hpp"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -172,17 +175,166 @@ namespace gui {
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 
-		//ImGui::SetNextWindowSize(ImVec2(425, 350));
+		ImGui::SetNextWindowSize(ImVec2(425, 350));
+		ImGui::Begin("Menu", &open, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+		DoTabs();
+		ImGui::Separator();
+		ImGui::SetCursorPos(ImVec2(75, 26));
+		if (ImGui::BeginChild("##Options", ImVec2(0, 0), true)) 
+		{
+			switch ((MenuTabs)g.gui.currentTab)
+			{
+				case BHOP:
+				{
+					components::combo_enum<BhopType>(g.bhop.BhopType, "Bhop", std::vector<BhopType> {
+						BhopType::DISABLED,
+						BhopType::NORMAL,
+						BhopType::PERFECT,
+					}, [=](BhopType type) 
+					{
+						if(type == BhopType::NORMAL)
+						{
+							return "Normal";
+						}
+						else if (type == BhopType::PERFECT)
+						{
+							return "Perfect";
+						}
+						return "Disabled";
+					});
 
+					if (g.bhop.BhopType != DISABLED)
+					{
+						ImGui::Checkbox("AutoStrafe", &g.bhop.AutoStrafe);
+					}
+				}
+				break;
+				case AIMBOT:
+				{
+					if (interfaces::engine->IsInGame() && interfaces::engine->IsConnected())
+					{
+						ImGui::Checkbox("Enable", &g.aimbot.enabled);
+						ImGui::Checkbox("Silent", &g.aimbot.silentAim);
+						ImGui::Checkbox("Smooth", &g.aimbot.smooth);
+						if (g.aimbot.smooth) {
+							ImGui::SliderFloat("Smooth Count", &g.aimbot.smoothCount, 0.1f, 1);
+						}
 
+						ImGui::SliderFloat("Aim Fov", &g.aimbot.fov, 5, 60);
+						ImGui::Checkbox("Show Fov", &g.aimbot.showFov);
+						if (g.aimbot.showFov) {
+							ImGui::ColorPicker4("Fov Color", g.aimbot.fovColor, ImGuiColorEditFlags_DisplayHex | ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_Float);
+						}
+						components::combo_list<int>(g.aimbot.aimBone, "Selected Bone", "None", std::vector {
+							9, 10, 13, 14
+						}, [=](int selected_bone) {
+							if (globals::localPlayer && globals::localPlayer->IsAlive())
+							{
+								return globals::localPlayer->GetBoneName(selected_bone);
+							}
+							return "Join Game First";
+						});
+					}
+				}
+				break;
+				case CHAMS:
+				{
+					ImGui::Checkbox("Enable", &g.chams.enabled);
+					if (g.chams.enabled) {
+						ImGui::ColorPicker3("Visible Color", g.chams.VisibleColor);
+						ImGui::ColorPicker3("No Visible Color", g.chams.HiddenColor);
+					}
+				}
+				break;
+				case ESP:
+				{
+					ImGui::Checkbox("Enable", &g.esp.enabled);
+					if (g.esp.enabled) {
+						ImGui::Checkbox("Show Teammates", &g.esp.showTeammates);
+						ImGui::ColorPicker4("Enemy Color", g.esp.drawBoxEnemyColor, ImGuiColorEditFlags_DisplayHex | ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_Float);
+						if (g.esp.showTeammates)
+						{
+							ImGui::ColorPicker4("Friendly Color", g.esp.drawBoxFriendlyColor, ImGuiColorEditFlags_DisplayHex | ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_Float);
+						}
+						ImGui::Checkbox("Draw Bones", &g.esp.drawBones);
+						if (g.esp.drawBones) {
+							ImGui::Checkbox("Draw Bone Names", &g.esp.drawBoneNames);
+							ImGui::ColorPicker4("Bone Color", g.esp.drawBoneColor, ImGuiColorEditFlags_DisplayHex | ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_Float);
+						}
+						ImGui::Checkbox("Snap Lines", &g.esp.drawSnapLines);
+						if (g.esp.drawSnapLines) {
+							ImGui::ColorPicker4("Snap Color", g.esp.drawSnapLineColor, ImGuiColorEditFlags_DisplayHex | ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_Float);
+						}
+						ImGui::Checkbox("Draw Health Bar", &g.esp.drawHealthBar);
+					}
+				}
+				break;
+				case VISUALS:
+				{
+					ImGui::Checkbox("Show Bullet Impact", &g.visuals.bullet_impact);
+					if (g.visuals.bullet_impact) {
+						ImGui::Checkbox("Show Others Players", &g.visuals.others_bullet_impact);
+						ImGui::ColorPicker4("Bullet Impact Color", g.visuals.bullet_impact_color, ImGuiColorEditFlags_DisplayHex | ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_Float);
+						ImGui::SliderFloat("Bullet Impact Duration", &g.visuals.bullet_impact_duration, 0.8f, 3.0f);
+					}
+					ImGui::SliderFloat("Additional Fov", &g.misc.additional_fov, -100, 100);
+					ImGui::Checkbox("No Flash", &g.visuals.no_flash);
+					ImGui::Checkbox("No Smokes", &g.visuals.no_smokes);
+				}
+				break;
+				case MISC:
+				{
+					ImGui::Checkbox("Show Spectators", &g.visuals.show_spectators);
+					if (g.visuals.show_spectators)
+					{
+						ImGui::SliderInt("X", &g.visuals.spectators_location[0], -globals::windowWidth, globals::windowWidth);
+						ImGui::SliderInt("Y", &g.visuals.spectators_location[1], -globals::windowHeight, globals::windowHeight);
+					}
+					if (ImGui::Checkbox("No Recoil", &g.misc.norecoil))
+					{
+						ConVar* cl_predictweapons = interfaces::convar->FindVar("cl_predictweapons");
+						if (cl_predictweapons)
+						{
+							cl_predictweapons->SetValue(g.misc.norecoil ? 1 : 0);
+						}
+					}
+					if (ImGui::Checkbox("Third Person", &g.misc.thirdperson)) {
+						ConVar* sv_cheats = interfaces::convar->FindVar("sv_cheats");
+
+						if (g.misc.thirdperson) {
+							if (sv_cheats->GetInt() != 1)
+								sv_cheats->SetValue(1);
+							interfaces::cinput->ToThirdPerson();
+						}
+						else {
+							if (sv_cheats->GetInt() == 1)
+								sv_cheats->SetValue(0);
+
+							interfaces::cinput->ToFirstPerson();
+						}
+					}
+				}
+				break;
+			}
+		}
+		ImGui::EndChild();
 		ImGui::End();
 
 		ImGui::EndFrame();
 		ImGui::Render();
 		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 	}
-	void DoTabs() noexcept {
-		
+	void DoTabs() noexcept 
+	{
+		if (ImGui::BeginChild("##Tabs", ImVec2(60, 0), true)) {
+			MakeMenuTab(MenuTabs::BHOP, "BHOP", ImVec2(44, 20));
+			MakeMenuTab(MenuTabs::AIMBOT, "Aimbot", ImVec2(44, 20));
+			MakeMenuTab(MenuTabs::CHAMS, "CHAMS", ImVec2(44, 20));
+			MakeMenuTab(MenuTabs::ESP, "ESP", ImVec2(44, 20));
+			MakeMenuTab(MenuTabs::VISUALS, "VISUALS", ImVec2(44, 20));
+			MakeMenuTab(MenuTabs::MISC, "MISC", ImVec2(44, 20));
+		}
+		ImGui::EndChild();
 	}
 }
 

@@ -4,7 +4,6 @@
 
 class bf_write;
 class bf_read;
-
 constexpr auto EVENT_DEBUG_ID_INIT = 42;
 constexpr auto EVENT_DEBUG_ID_SHUTDOWN = 13;
 

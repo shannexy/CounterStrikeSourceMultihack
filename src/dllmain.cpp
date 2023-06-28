@@ -1,4 +1,4 @@
-#include "common.hpp"
+    #include "common.hpp"
 
 void HackThread(HMODULE instance)
 {
@@ -15,6 +15,7 @@ void HackThread(HMODULE instance)
         file_manager_instance = std::make_unique<file_manager>(base_dir);
         thread_pool_instance = std::make_unique<thread_pool>();
 
+        memory::Setup();
 		interfaces::Setup();
 		gui::Setup();
 		hooks::Setup();
@@ -38,17 +39,33 @@ void HackThread(HMODULE instance)
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
 
+    if (gui::open) {
+        gui::open = false;
+
+        interfaces::surface->SetCursorAlwaysVisible(false);
+    }
+
+
 UNLOAD:
 #if _DEBUG
     console::close();
 #endif
-    g.attempt_save();
-    g.destroy();
-    hooks::Destroy();
-    thread_pool_instance->destroy();
-    thread_pool_instance.reset();
-    file_manager_instance.reset();
-    FreeLibraryAndExitThread(instance, 0);
+    try
+    {
+        g.attempt_save();
+        g.destroy();
+        thread_pool_instance->destroy();
+        thread_pool_instance.reset();
+        file_manager_instance.reset();
+        hooks::Destroy();
+        gui::Destroy();
+        interfaces::Destroy();
+        FreeLibraryAndExitThread(instance, 0);
+    }
+    catch (std::exception const& ex)
+    {
+        console::print(ex.what());
+    }
 }
 
 BOOL APIENTRY DllMain(HMODULE instance, DWORD reason, LPVOID reserved)
@@ -66,8 +83,7 @@ BOOL APIENTRY DllMain(HMODULE instance, DWORD reason, LPVOID reserved)
                 instance,
                 0,
                 nullptr
-            ))
-                CloseHandle(thread);
+            )) CloseHandle(thread);
         }
 
     }

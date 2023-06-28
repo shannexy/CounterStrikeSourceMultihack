@@ -35,6 +35,11 @@ public:
 		return memory::Call<std::int32_t>(this, 12);
 	}
 
+	constexpr void GetViewAngles(const CVector& viewAngles) noexcept
+	{
+		memory::Call<void, const CVector&>(this, 19, viewAngles);
+	}
+
 	constexpr void SetViewAngles(const CVector& viewAngles) noexcept
 	{
 		memory::Call<void, const CVector&>(this, 20, viewAngles);
@@ -44,6 +49,10 @@ public:
 	constexpr bool IsInGame() noexcept
 	{
 		return memory::Call<bool>(this, 26);
+	}
+
+	constexpr bool IsTakingScreenshot() noexcept {
+		return memory::Call<bool>(this, 85);
 	}
 
 	constexpr int GetPlayerForUserID(int userid) noexcept {

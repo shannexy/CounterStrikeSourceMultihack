@@ -79,6 +79,7 @@
     <PublicIncludeDirectories>D:\#Projetos\VisualStudio\CounterStrikeSourceMultiHack\ext\includes;$(PublicIncludeDirectories)</PublicIncludeDirectories>
     <PublicModuleDirectories>D:\#Projetos\VisualStudio\CounterStrikeSourceMultiHack\ext\includes;$(PublicModuleDirectories)</PublicModuleDirectories>
     <LinkIncremental>true</LinkIncremental>
+    <IntDir>$(SolutionDir)$(Configuration)\intermediates\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -95,7 +96,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalDependencies>d3d9.lib;libMinHook-x86-v141-mdd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>D:\#Projetos\VisualStudio\CounterStrikeSourceMultiHack\ext\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -124,7 +125,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>d3d9.lib;libMinHook-x86-v141-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;libMinHook-x86-v141-mdd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>D:\#Projetos\VisualStudio\CounterStrikeSourceMultiHack\ext\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ProjectReference>
@@ -209,22 +210,35 @@
     <ClInclude Include="src\core\Singleton.hpp" />
     <ClInclude Include="src\core\thread_pool.hpp" />
     <ClInclude Include="src\common.hpp" />
+    <ClInclude Include="src\features\aimbot.hpp" />
+    <ClInclude Include="src\features\BulletImpact.hpp" />
     <ClInclude Include="src\features\bunnyhop.hpp" />
+    <ClInclude Include="src\features\Spectators.hpp" />
+    <ClInclude Include="src\features\ThirdPerson.hpp" />
     <ClInclude Include="src\gui\components.hpp" />
     <ClInclude Include="src\sdk.hpp" />
     <ClInclude Include="src\utils\datatable.hpp" />
     <ClInclude Include="src\utils\hash.hpp" />
     <ClInclude Include="src\utils\memory.hpp" />
+    <ClInclude Include="src\valve\annotations.hpp" />
     <ClInclude Include="src\valve\basehandle.hpp" />
+    <ClInclude Include="src\valve\cbaseanimating.hpp" />
+    <ClInclude Include="src\valve\cbaseclientstate.hpp" />
+    <ClInclude Include="src\valve\cbasecombatweapon.hpp" />
     <ClInclude Include="src\valve\ccolor.hpp" />
     <ClInclude Include="src\valve\centity.hpp" />
     <ClInclude Include="src\valve\chandle.hpp" />
     <ClInclude Include="src\valve\checksum\checksum_crc.hpp" />
     <ClInclude Include="src\valve\cinput.hpp" />
+    <ClInclude Include="src\valve\ckeyvalues.hpp" />
     <ClInclude Include="src\valve\cmatrix.hpp" />
+    <ClInclude Include="src\valve\CThirdPersonManager.hpp" />
     <ClInclude Include="src\valve\cusercmd.hpp" />
+    <ClInclude Include="src\valve\cutlmemory.hpp" />
+    <ClInclude Include="src\valve\cutlstring.hpp" />
     <ClInclude Include="src\valve\cutlvector.hpp" />
     <ClInclude Include="src\valve\cvector.hpp" />
+    <ClInclude Include="src\valve\iappsystem.hpp" />
     <ClInclude Include="src\valve\ibaseclientdll.hpp" />
     <ClInclude Include="src\valve\ibaseinterface.hpp" />
     <ClInclude Include="src\valve\icliententity.hpp" />
@@ -236,13 +250,21 @@
     <ClInclude Include="src\valve\iclientthinkable.hpp" />
     <ClInclude Include="src\valve\iclientunknown.hpp" />
     <ClInclude Include="src\valve\icollideable.hpp" />
+    <ClInclude Include="src\valve\ienginetrace.hpp" />
+    <ClInclude Include="src\valve\ienginevgui.hpp" />
     <ClInclude Include="src\valve\igameventmanager.hpp" />
+    <ClInclude Include="src\valve\iglobalvars.hpp" />
     <ClInclude Include="src\valve\ihandleentity.hpp" />
+    <ClInclude Include="src\valve\imaterialsystem.hpp" />
     <ClInclude Include="src\valve\ispatialquery.hpp" />
+    <ClInclude Include="src\valve\istudiorender.hpp" />
     <ClInclude Include="src\valve\isurface.hpp" />
+    <ClInclude Include="src\valve\ivdebugoverlay.hpp" />
     <ClInclude Include="src\valve\ivengineclient.hpp" />
+    <ClInclude Include="src\valve\iviewrender_beams.hpp" />
     <ClInclude Include="src\valve\ivmodelinfo.hpp" />
     <ClInclude Include="src\valve\ivpanel.hpp" />
+    <ClInclude Include="src\valve\structs.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ext\includes\imgui\imgui.cpp" />
@@ -277,10 +299,15 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\features\aimbot.cpp" />
+    <ClCompile Include="src\features\BulletImpact.cpp" />
     <ClCompile Include="src\features\bunnyhop.cpp" />
+    <ClCompile Include="src\features\Spectators.cpp" />
+    <ClCompile Include="src\features\ThirdPerson.cpp" />
     <ClCompile Include="src\utils\memory.cpp" />
     <ClCompile Include="src\valve\checksum\checksum_crc.cpp" />
     <ClCompile Include="src\valve\isurface.cpp" />
+    <ClCompile Include="src\valve\icvar.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

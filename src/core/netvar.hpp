@@ -27,3 +27,9 @@ inline std::add_lvalue_reference_t<__VA_ARGS__> name() noexcept \
 	static const std::uint32_t offset = netvars::data[fnv::CompileTime(var)]; \
 	return *reinterpret_cast<std::add_pointer_t<__VA_ARGS__>>(std::uint32_t(this) + offset); \
 }
+
+#define OFFSET(name, baseclass, propname, type) \
+	type name = memory::Get<type>(this, netvars::GetOffset(baseclass, propname));
+
+#define RETURN_OFFSET(name, baseclass, propname, type) \
+	memory::Get<type>(this, netvars::GetOffset(baseclass, propname));

@@ -28,4 +28,25 @@ public:
 			ImGui::EndCombo();
 		}
 	}
+
+	template<class T>
+	static void combo_enum(T& selected_enum, std::string_view label, std::vector<T> items, std::function<std::string_view(T current)> item_callback) {
+		if (
+			ImGui::BeginCombo(
+				label.data(),
+				static_cast<std::string_view>(item_callback(selected_enum)).data()
+			)
+		) {
+			for (size_t i = 0; i < items.size(); i++)
+			{
+				auto text = static_cast<std::string_view>(item_callback((T)i)).data();
+				if (ImGui::Selectable(text, selected_enum == i))
+					selected_enum = (T)i;
+
+				if (selected_enum == i)
+					ImGui::SetItemDefaultFocus();
+			}
+			ImGui::EndCombo();
+		}
+	}
 };

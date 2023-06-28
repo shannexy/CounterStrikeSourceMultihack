@@ -1,8 +1,9 @@
 #pragma once
 
 class IClientUnknown;
-class bf_read;
 class ClientClass;
+class bf_read;
+
 enum ShouldTransmitState_t
 {
 	SHOULDTRANSMIT_START = 0,
